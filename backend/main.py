@@ -1,8 +1,10 @@
-# backend/main.py - UPDATED VERSION (remove modules 1 & 3)
-
+# backend/main.py - FIXED VERSION
 import sys
+import os  # ← Must come BEFORE using os
+
+# Now this works
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import os
+
 import json
 import random
 import secrets
@@ -36,8 +38,6 @@ from auth import (
     get_current_user, get_optional_user, get_db_dependency as auth_get_db_dependency
 )
 
-# REMOVED: interview_logic, feedback_engine imports
-# REMOVED: email_utils import
 from routes.aptitude import router as aptitude_router
 
 # REMOVED: interview_router, career_router, gamification, settings imports
