@@ -65,7 +65,7 @@ export default function Signup() {
     try {
       const data = await signupApi(formData.name, formData.email, formData.password);
       login(data.access_token, data.user);
-      navigate("/dashboard");
+      navigate('/master-dashboard');
     } catch (err) {
       let errorMessage = "Signup failed. Please try again.";
       if (err.message) errorMessage = err.message;
