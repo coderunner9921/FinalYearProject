@@ -10,15 +10,15 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_
 
-from db_models import (
+from backend.db_models import (
     User, AptitudeQuestion, AptitudeTest, AptitudeAttempt, 
     AptitudeProgress, SJTScenario
 )
-from auth import get_current_user, get_db_dependency
+from backend.auth import get_current_user, get_db_dependency
 
-from utils.question_manager import QuestionManager
-from utils.sjt_manager import SJTManager
-from utils.question_tracker import question_tracker
+from backend.utils.question_manager import QuestionManager
+from backend.utils.sjt_manager import SJTManager
+from backend.utils.question_tracker import question_tracker
 
 # =================== PATHS ===================
 BASE_DIR = Path(__file__).resolve().parent.parent

@@ -10,7 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from dotenv import load_dotenv
 from typing import Optional
-from db_models import User
+
+from backend.db_models import User
 
 load_dotenv()
 

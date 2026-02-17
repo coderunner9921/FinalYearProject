@@ -1,5 +1,7 @@
 # backend/main.py - UPDATED VERSION (remove modules 1 & 3)
 
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import os
 import json
 import random
