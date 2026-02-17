@@ -1,10 +1,6 @@
 # backend/main.py - FIXED VERSION
 import sys
 import os  # ← Must come BEFORE using os
-
-# Now this works
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 import json
 import random
 import secrets
@@ -27,18 +23,18 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select, func
 from dotenv import load_dotenv
 from pydantic import BaseModel
-from database import engine, AsyncSessionLocal, get_db
-from db_models import AptitudeProgress, AptitudeTest, Base, PasswordResetToken, User
-from schemas import (
+from backend.database import engine, AsyncSessionLocal, get_db
+from backend.db_models import AptitudeProgress, AptitudeTest, Base, PasswordResetToken, User
+from backend.schemas import (
     UserCreate, UserLogin, TokenResponse, UserResponse,
     ForgotPasswordRequest, ResetPasswordRequest
 )
-from auth import (
+from backend.auth import (
     hash_password, verify_password, create_access_token,
     get_current_user, get_optional_user, get_db_dependency as auth_get_db_dependency
 )
 
-from routes.aptitude import router as aptitude_router
+from backend.routes.aptitude import router as aptitude_router
 
 # REMOVED: interview_router, career_router, gamification, settings imports
 

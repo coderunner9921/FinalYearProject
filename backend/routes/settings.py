@@ -12,8 +12,8 @@ from typing import Optional
 from passlib.context import CryptContext
 from datetime import date
 
-from auth import get_current_user
-from db_models import User
+from backend.auth import get_current_user
+from backend.db_models import User
 
 router = APIRouter(prefix="/settings", tags=["settings"])
 
@@ -49,7 +49,7 @@ class PreferencesRequest(BaseModel):
 
 async def get_db():
     """Database dependency"""
-    from database import get_db as main_get_db
+    from backend.database import get_db as main_get_db
     async for session in main_get_db():
         yield session
 
