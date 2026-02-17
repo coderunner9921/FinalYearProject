@@ -3,8 +3,8 @@ import random
 from typing import List, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
-from db_models import AptitudeQuestion
-from .ai_question_generator import AIQuestionGenerator
+from backend.db_models import AptitudeQuestion
+from backend.utils.ai_question_generator import AIQuestionGenerator
 import json
 import hashlib
 from datetime import datetime

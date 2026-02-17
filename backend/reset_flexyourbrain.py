@@ -13,10 +13,10 @@ sys.path.append(str(Path(__file__).parent))
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text, select, func, delete
-from db_models import AptitudeQuestion, SJTScenario, AptitudeTest, AptitudeAttempt, AptitudeProgress
+from backend.db_models import AptitudeQuestion, SJTScenario, AptitudeTest, AptitudeAttempt, AptitudeProgress
 import os
 from dotenv import load_dotenv
-from utils.ai_question_generator import AIQuestionGenerator
+from backend.utils.ai_question_generator import AIQuestionGenerator
 from datetime import datetime, timezone
 
 load_dotenv()

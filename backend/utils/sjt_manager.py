@@ -8,8 +8,8 @@ import random
 from typing import List, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
-from db_models import SJTScenario
-from .ai_question_generator import AIQuestionGenerator
+from backend.db_models import SJTScenario
+from backend.utils.ai_question_generator import AIQuestionGenerator
 
 
 class SJTManager:
