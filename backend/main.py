@@ -104,9 +104,9 @@ app = FastAPI(
     title="SkillBridge API - FlexYourBrain Module",
     version="1.0.0",
     description="AI-powered aptitude testing platform",
-    docs_url="/docs" if DEBUG else None,  # Disable docs in production
-    redoc_url="/redoc" if DEBUG else None,
-    swagger_ui_parameters={"persistAuthorization": True} if DEBUG else {},
+    docs_url="/docs",
+    redoc_url="/redoc",
+    swagger_ui_parameters={"persistAuthorization": True},
 )
 
 # CORS Configuration
