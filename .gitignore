@@ -1,0 +1,173 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+
+# Node / React
+node_modules/
+build/
+dist/
+.env
+.DS_Store
+
+# Virtual environments
+venv/
+.env/
+.envrc
+
+# Recordings, models, etc.
+backend/recordings/
+backend/models/
+*.wav
+*.mp3
+
+# IDE settings
+.vscode/
+.idea/
+*.log
+
+# === Python ===
+__pycache__/
+*.py[cod]
+
+instance/
+.env
+.env.*
+venv/
+ENV/
+env/
+.venv/
+*.log
+*.egg-info/
+dist/
+build/
+*.mypy_cache/
+*.pytest_cache/
+
+# === FastAPI / Backend ===
+/recordings/
+recordings/
+__pycache__/
+/backend/__pycache__/
+/backend/recordings/
+/backend/__pycache__/
+/backend/*.db
+/backend/*.sqlite3
+
+# === Node / React / Vite ===
+node_modules/
+dist/
+.vite/
+.cache/
+coverage/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# === OS Files ===
+Thumbs.db
+
+# === VS Code ===
+.vscode/
+.history/
+*.code-workspace
+
+# === Other ===
+/frontend/vite-project/node_modules/
+/frontend/vite-project/dist/
+
+*.db
+
+# === Python ===
+*.db
+*.sqlite3
+
+# === Virtual Environment ===
+.env.*
+
+# === Logs & Cache ===
+*.log
+logs/
+*.sqlite
+*.db-journal
+
+# === Recordings & Generated Data ===
+backend/uploads/
+backend/temp/
+backend/audio/
+backend/__pycache__/
+
+# === Frontend (Vite/Node) ===
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.DS_Store
+
+# === IDE / OS Files ===
+.vscode/
+.idea/
+Thumbs.db
+
+# === Models & Large Files ===
+*.pt
+*.bin
+*.h5
+*.pkl
+models/
+huggingface/
+whisper/
+
+# =========================
+# Python / FastAPI Backend
+# =========================
+*.db
+*.sqlite3
+*.db-journal
+
+# Virtual Environment
+.env.*
+
+# Logs & Cache
+*.log
+backend/logs/
+backend/__pycache__/
+
+# Recordings & Temporary Files
+backend/recordings/
+backend/uploads/
+backend/temp/
+backend/audio/
+backend/cache/
+
+# AI / ML Models (Heavy files)
+models/
+huggingface/
+whisper/
+*.pt
+*.bin
+*.h5
+*.pkl
+
+
+
+
+# Add to .gitignore
+recordings/videos/*.webm
+recordings/videos/*.mp4
+recordings/audio/*.wav
+
+
+# Database dumps
+*.dump
+*.sql
+
+# SQLite / local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Local dev database
+db.sqlite3

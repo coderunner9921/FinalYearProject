@@ -1,0 +1,314 @@
+# db_models.py - UPDATED WITH PROGRESS TRACKING
+from datetime import datetime, timedelta
+from sqlalchemy import Column, Integer, String, Text, JSON, DateTime, ForeignKey, Float, Boolean
+from sqlalchemy.orm import declarative_base, relationship
+import secrets
+
+Base = declarative_base()
+
+# ============================================
+# EXISTING TABLES (UNCHANGED)
+# ============================================
+
+class User(Base):
+    __tablename__ = "users"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    email = Column(String(255), unique=True, index=True, nullable=False)
+    password_hash = Column(String(255), nullable=False)
+    role = Column(String(20), default="user")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships - Interview Module
+    interviews = relationship("Interview", back_populates="user")
+    progress = relationship("UserProgress", back_populates="user")
+    reset_tokens = relationship("PasswordResetToken", back_populates="user", cascade="all, delete")
+    
+    # Relationships - FlexYourBrain Module
+    aptitude_tests = relationship("AptitudeTest", back_populates="user")
+    aptitude_progress = relationship("AptitudeProgress", back_populates="user")
+    
+    # Relationships - CareerCrush Module
+    resumes = relationship("Resume", back_populates="user")
+    cover_letters = relationship("CoverLetter", back_populates="user")
+    career_progress = relationship("CareerProgress", back_populates="user")
+
+class Interview(Base):
+    __tablename__ = "interviews"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    domain = Column(String(50))
+    question = Column(Text)
+    response = Column(Text)
+    feedback = Column(JSON)
+    audio_path = Column(String(500))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User", back_populates="interviews")
+
+class UserProgress(Base):
+    """Progress tracking for Interview Module (existing)"""
+    __tablename__ = "user_progress"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    domain = Column(String(50))
+    total_sessions = Column(Integer, default=0)
+    avg_clarity_score = Column(Float, default=0.0)
+    avg_confidence_score = Column(Float, default=0.0)
+    avg_grammar_score = Column(Float, default=0.0)
+    avg_overall_score = Column(Float, default=0.0)
+    last_practice_date = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User", back_populates="progress")
+
+class PasswordResetToken(Base):
+    __tablename__ = "password_reset_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    token = Column(String, unique=True, index=True)
+    expires_at = Column(DateTime, default=lambda: datetime.utcnow() + timedelta(hours=1))
+
+    user = relationship("User", back_populates="reset_tokens")
+
+
+# ============================================
+# NEW TABLES - MEMBER 2: FLEXYOURBRAIN
+# ============================================
+
+class AptitudeQuestion(Base):
+    """
+    Master question bank for all aptitude categories
+    """
+    __tablename__ = "aptitude_questions"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    category = Column(String(50), nullable=False)  # Logical, Quantitative, Verbal, Coding
+    subcategory = Column(String(100))  # Data Interpretation, Percentages, etc.
+    difficulty = Column(String(20), default="medium")  # easy, medium, hard
+    question_text = Column(Text, nullable=False)
+    options = Column(JSON)  # ["Option A", "Option B", "Option C", "Option D"]
+    correct_answer = Column(String(10), nullable=False)  # "A", "B", "C", "D"
+    explanation = Column(Text)  # Detailed explanation of the answer
+    time_limit = Column(Integer, default=60)  # seconds per question
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    attempts = relationship("AptitudeAttempt", back_populates="question")
+
+class AptitudeTest(Base):
+    """
+    Individual test sessions (Practice, Mock, SJT)
+    """
+    __tablename__ = "aptitude_tests"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    test_type = Column(String(20), nullable=False)  # practice, mock, sjt
+    category = Column(String(50))  # Logical, Quantitative, Verbal, Coding
+    total_questions = Column(Integer, default=0)
+    correct_answers = Column(Integer, default=0)
+    score_percentage = Column(Float, default=0.0)
+    time_taken = Column(Integer)  # seconds
+    time_limit = Column(Integer)  # seconds (for timed tests)
+    status = Column(String(20), default="in_progress")  # in_progress, completed, abandoned
+    started_at = Column(DateTime, default=datetime.utcnow)
+    completed_at = Column(DateTime, nullable=True)
+    
+    # Relationships
+    user = relationship("User", back_populates="aptitude_tests")
+    attempts = relationship("AptitudeAttempt", back_populates="test", cascade="all, delete")
+
+class AptitudeAttempt(Base):
+    """
+    Individual question attempts within a test
+    """
+    __tablename__ = "aptitude_attempts"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    test_id = Column(Integer, ForeignKey("aptitude_tests.id", ondelete="CASCADE"), nullable=False)
+    question_id = Column(Integer, ForeignKey("aptitude_questions.id"), nullable=False)
+    user_answer = Column(String(10))  # "A", "B", "C", "D", or null if skipped
+    is_correct = Column(Boolean, default=False)
+    time_taken = Column(Integer)  # seconds spent on this question
+    attempted_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    test = relationship("AptitudeTest", back_populates="attempts")
+    question = relationship("AptitudeQuestion", back_populates="attempts")
+
+class AptitudeProgress(Base):
+    """
+    Progress tracking for FlexYourBrain module (like UserProgress for interviews)
+    Tracks user performance per category over time
+    """
+    __tablename__ = "aptitude_progress"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    category = Column(String(50), nullable=False)  # Logical, Quantitative, Verbal, Coding
+    
+    # Session Stats
+    total_tests = Column(Integer, default=0)
+    total_questions_attempted = Column(Integer, default=0)
+    total_correct_answers = Column(Integer, default=0)
+    
+    # Score Averages
+    avg_score_percentage = Column(Float, default=0.0)
+    best_score_percentage = Column(Float, default=0.0)
+    avg_time_per_question = Column(Float, default=0.0)  # seconds
+    
+    # Difficulty Performance
+    easy_accuracy = Column(Float, default=0.0)
+    medium_accuracy = Column(Float, default=0.0)
+    hard_accuracy = Column(Float, default=0.0)
+    
+    # Activity Tracking
+    last_practice_date = Column(DateTime, default=datetime.utcnow)
+    current_streak = Column(Integer, default=0)  # consecutive days
+    longest_streak = Column(Integer, default=0)
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User", back_populates="aptitude_progress")
+
+class SJTScenario(Base):
+    """
+    Situational Judgement Test scenarios
+    """
+    __tablename__ = "sjt_scenarios"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    scenario_text = Column(Text, nullable=False)
+    options = Column(JSON)  # List of response options
+    most_effective = Column(String(10))  # "A", "B", etc.
+    least_effective = Column(String(10))
+    explanation = Column(Text)
+    category = Column(String(50))  # Teamwork, Leadership, Conflict, etc.
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+# ============================================
+# NEW TABLES - MEMBER 3: CAREERCRUSH
+# ============================================
+
+class Resume(Base):
+    """
+    Uploaded resume files and metadata
+    """
+    __tablename__ = "resumes"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    filename = Column(String(255), nullable=False)
+    file_path = Column(String(500), nullable=False)
+    file_type = Column(String(20))  # pdf, docx
+    parsed_text = Column(Text)  # Extracted text content
+    uploaded_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User", back_populates="resumes")
+    analyses = relationship("ResumeAnalysis", back_populates="resume", cascade="all, delete")
+
+class ResumeAnalysis(Base):
+    """
+    Resume analysis results against job descriptions
+    """
+    __tablename__ = "resume_analyses"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    resume_id = Column(Integer, ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False)
+    job_description = Column(Text, nullable=False)
+    job_title = Column(String(200))
+    company_name = Column(String(200))
+    
+    # Scores
+    match_score = Column(Float, default=0.0)  # Overall match percentage
+    ats_score = Column(Float, default=0.0)  # ATS-friendliness score
+    
+    # Analysis Results
+    matched_keywords = Column(JSON)  # ["python", "sql", "teamwork"]
+    missing_keywords = Column(JSON)  # ["docker", "aws", "leadership"]
+    suggestions = Column(JSON)  # [{"type": "add_keyword", "text": "..."}]
+    
+    # Detailed Scores
+    skills_match = Column(Float, default=0.0)
+    experience_match = Column(Float, default=0.0)
+    education_match = Column(Float, default=0.0)
+    formatting_score = Column(Float, default=0.0)
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    resume = relationship("Resume", back_populates="analyses")
+
+class CoverLetter(Base):
+    """
+    Generated cover letters
+    """
+    __tablename__ = "cover_letters"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    resume_id = Column(Integer, ForeignKey("resumes.id"), nullable=True)
+    job_title = Column(String(200))
+    company_name = Column(String(200))
+    job_description = Column(Text)
+    generated_letter = Column(Text, nullable=False)
+    
+    # Metadata
+    generation_method = Column(String(20), default="template")  # template, ai, hybrid
+    is_edited = Column(Boolean, default=False)  # User made edits
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User", back_populates="cover_letters")
+
+class CareerProgress(Base):
+    """
+    Progress tracking for CareerCrush module
+    Tracks resume reviews, cover letters, and overall career prep activity
+    """
+    __tablename__ = "career_progress"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    
+    # Resume Stats
+    total_resumes_uploaded = Column(Integer, default=0)
+    total_analyses_run = Column(Integer, default=0)
+    avg_ats_score = Column(Float, default=0.0)
+    best_ats_score = Column(Float, default=0.0)
+    avg_match_score = Column(Float, default=0.0)
+    
+    # Cover Letter Stats
+    total_cover_letters = Column(Integer, default=0)
+    
+    # Activity Tracking
+    last_activity_date = Column(DateTime, default=datetime.utcnow)
+    resumes_this_week = Column(Integer, default=0)
+    resumes_this_month = Column(Integer, default=0)
+    
+    # Improvement Metrics
+    ats_score_improvement = Column(Float, default=0.0)  # vs first resume
+    most_improved_area = Column(String(100))  # "skills", "formatting", etc.
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User", back_populates="career_progress")

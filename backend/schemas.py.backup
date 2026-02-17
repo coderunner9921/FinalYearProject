@@ -1,0 +1,243 @@
+from pydantic import BaseModel, EmailStr, ConfigDict
+from typing import Optional, List
+from datetime import datetime
+
+# =================== USER SCHEMAS ===================
+
+class UserCreate(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class UserResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    name: str
+    email: str
+    role: str
+    created_at: datetime
+
+class TokenResponse(BaseModel):
+    access_token: str
+    user: UserResponse
+
+# =================== INTERVIEW SCHEMAS (EXISTING) ===================
+
+class InterviewResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    user_id: Optional[int]
+    domain: str
+    question: str
+    response: str
+    feedback: dict
+    created_at: datetime
+
+class InterviewHistoryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    domain: str
+    question: str
+    created_at: datetime
+    overall_score: Optional[float] = None
+
+class DomainProgressResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    domain: str
+    total_sessions: int
+    avg_clarity_score: float
+    avg_confidence_score: float
+    avg_grammar_score: float
+    avg_overall_score: float
+    last_practice_date: datetime
+
+# =================== FLEXYOURBRAIN SCHEMAS (NEW) ===================
+
+class AptitudeQuestionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    category: str
+    subcategory: Optional[str]
+    difficulty: str
+    question_text: str
+    options: List[str]
+    time_limit: int
+    # Note: correct_answer and explanation excluded for security
+
+class AptitudeTestCreate(BaseModel):
+    test_type: str  # practice, mock, sjt
+    category: str
+    time_limit: Optional[int] = None
+
+class AptitudeTestResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    test_type: str
+    category: str
+    total_questions: int
+    correct_answers: int
+    score_percentage: float
+    time_taken: Optional[int]
+    status: str
+    started_at: datetime
+    completed_at: Optional[datetime]
+
+class AptitudeSubmitAnswer(BaseModel):
+    test_id: int
+    question_id: int
+    user_answer: Optional[str]
+    time_taken: int
+
+class AptitudeProgressResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    category: str
+    total_tests: int
+    total_questions_attempted: int
+    total_correct_answers: int
+    avg_score_percentage: float
+    best_score_percentage: float
+    avg_time_per_question: float
+    easy_accuracy: float
+    medium_accuracy: float
+    hard_accuracy: float
+    last_practice_date: datetime
+    current_streak: int
+    longest_streak: int
+
+# =================== CAREERCRUSH SCHEMAS (NEW) ===================
+
+class ResumeUploadResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    filename: str
+    file_type: str
+    uploaded_at: datetime
+
+class ResumeAnalysisCreate(BaseModel):
+    resume_id: int
+    job_description: str
+    job_title: Optional[str] = None
+    company_name: Optional[str] = None
+
+class ResumeAnalysisResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    resume_id: int
+    job_title: Optional[str]
+    company_name: Optional[str]
+    match_score: float
+    ats_score: float
+    matched_keywords: List[str]
+    missing_keywords: List[str]
+    suggestions: List[dict]
+    skills_match: float
+    experience_match: float
+    education_match: float
+    formatting_score: float
+    created_at: datetime
+
+class CoverLetterCreate(BaseModel):
+    resume_id: Optional[int] = None
+    job_title: str
+    company_name: str
+    job_description: str
+
+class CoverLetterResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    job_title: Optional[str]
+    company_name: Optional[str]
+    generated_letter: str
+    generation_method: str
+    is_edited: bool
+    created_at: datetime
+
+class CareerProgressResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    total_resumes_uploaded: int
+    total_analyses_run: int
+    avg_ats_score: float
+    best_ats_score: float
+    avg_match_score: float
+    total_cover_letters: int
+    last_activity_date: datetime
+    resumes_this_week: int
+    resumes_this_month: int
+    ats_score_improvement: float
+    most_improved_area: Optional[str]
+
+# =================== PASSWORD RESET SCHEMAS (EXISTING) ===================
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+class PasswordResetResponse(BaseModel):
+    message: str
+    dev_token: Optional[str] = None
+
+class TokenVerificationResponse(BaseModel):
+    valid: bool
+    email: str
+
+# =================== MASTER DASHBOARD SCHEMAS ===================
+
+class MasterDashboardStats(BaseModel):
+    """Aggregated stats for all three modules"""
+    # Interview Module
+    total_interviews: int
+    interview_avg_score: float
+    
+    # FlexYourBrain Module
+    total_aptitude_tests: int
+    aptitude_avg_score: float
+    
+    # CareerCrush Module
+    total_resumes: int
+    career_avg_ats: float
+    
+    # Overall
+    overall_score: float
+    weekly_progress: float
+    current_streak: int
+
+class UserDashboardResponse(BaseModel):
+    """Comprehensive dashboard for a user"""
+    user: UserResponse
+    
+    # Interview stats
+    total_interviews: int
+    domains_practiced: int
+    interview_progress: List[DomainProgressResponse]
+    
+    # Aptitude stats
+    total_tests: int
+    aptitude_progress: List[AptitudeProgressResponse]
+    
+    # Career stats
+    total_resumes: int
+    career_progress: Optional[CareerProgressResponse]
+    
+    # Overall
+    overall_stats: MasterDashboardStats

@@ -1,0 +1,20 @@
+# render.yaml - Infrastructure as Code for Render.com
+# Place this file in your repository root
+
+services:
+  # Backend Web Service
+  - type: web
+    name: skillbridge-backend
+    runtime: python
+    region: singapore # Change to your preferred region
+    plan: free # or 'starter' for production
+    branch: user/Astle-InterviewIQ
+    rootDir: backend
+    buildCommand: "pip install --upgrade pip setuptools wheel && pip install -r requirements.txt"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: PIP_NO_CACHE_DIR
+        value: "1"
