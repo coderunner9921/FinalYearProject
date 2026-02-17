@@ -64,22 +64,22 @@ export default function Profile() {
       const [
         profileRes, gamRes, badgesRes, recentRes, statsRes, progressRes
       ] = await Promise.all([
-        fetch('http://127.0.0.1:8000/api/settings/profile', {
+        fetch('https://finalyearproject-t10v.onrender.com/api/settings/profile', {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('http://127.0.0.1:8000/api/gamification/stats', {
+        fetch('https://finalyearproject-t10v.onrender.com/api/gamification/stats', {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('http://127.0.0.1:8000/api/gamification/badges/earned', {
+        fetch('https://finalyearproject-t10v.onrender.com/api/gamification/badges/earned', {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('http://127.0.0.1:8000/api/user/recent-interviews?limit=5', {
+        fetch('https://finalyearproject-t10v.onrender.com/api/user/recent-interviews?limit=5', {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('http://127.0.0.1:8000/api/user/stats', {
+        fetch('https://finalyearproject-t10v.onrender.com/api/user/stats', {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('http://127.0.0.1:8000/api/user/progress-by-domain', {
+        fetch('https://finalyearproject-t10v.onrender.com/api/user/progress-by-domain', {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);

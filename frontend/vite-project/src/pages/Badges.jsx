@@ -31,7 +31,7 @@ export default function Badges() {
       setLoading(true);
 
       // Fetch earned badges
-      const earnedRes = await fetch('http://127.0.0.1:8000/api/gamification/badges/earned', {
+      const earnedRes = await fetch('https://finalyearproject-t10v.onrender.com/api/gamification/badges/earned', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -41,7 +41,7 @@ export default function Badges() {
       }
 
       // Fetch available badges
-      const availableRes = await fetch('http://127.0.0.1:8000/api/gamification/badges/available', {
+      const availableRes = await fetch('https://finalyearproject-t10v.onrender.com/api/gamification/badges/available', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       

@@ -50,7 +50,7 @@ export default function Settings() {
     setSaving(true);
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/settings/change-password', {
+      const res = await fetch('https://finalyearproject-t10v.onrender.com/api/settings/change-password', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -107,7 +107,7 @@ export default function Settings() {
     setSaving(true);
 
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/settings/account?current_password=${encodeURIComponent(password)}`, {
+      const res = await fetch(`https://finalyearproject-t10v.onrender.com/api/settings/account?current_password=${encodeURIComponent(password)}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

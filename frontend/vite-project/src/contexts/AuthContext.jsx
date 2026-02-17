@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
   const fetchUser = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://127.0.0.1:8000/auth/me', {
+      const response = await fetch('https://finalyearproject-t10v.onrender.com/auth/me', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

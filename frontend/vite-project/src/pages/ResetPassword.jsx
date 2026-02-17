@@ -33,7 +33,7 @@ export default function ResetPassword() {
     }
 
     try {
-      const res = await fetch(`http://127.0.0.1:8000/auth/verify-reset-token/${token}`);
+      const res = await fetch(`https://finalyearproject-t10v.onrender.com/auth/verify-reset-token/${token}`);
       
       if (!res.ok) {
         const data = await res.json();
@@ -68,7 +68,7 @@ export default function ResetPassword() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/auth/reset-password", {
+      const res = await fetch("https://finalyearproject-t10v.onrender.com/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, new_password: newPassword }),
