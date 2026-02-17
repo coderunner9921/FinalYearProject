@@ -1,4 +1,6 @@
 // frontend/vite-project/src/api/aptitude.js
+import config from '../config';
+const API_BASE = config.API_URL;
 
 import api from "../utils/api.js";
 
