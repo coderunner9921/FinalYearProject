@@ -33,7 +33,7 @@ from backend.auth import (
     hash_password, verify_password, create_access_token,
     get_current_user, get_optional_user, get_db_dependency as auth_get_db_dependency
 )
-
+from backend.utils.email_utils import send_reset_email
 from backend.routes.aptitude import router as aptitude_router
 
 # REMOVED: interview_router, career_router, gamification, settings imports
@@ -269,18 +269,24 @@ async def forgot_password(
     result = await db.execute(select(User).where(User.email == request.email))
     user = result.scalar_one_or_none()
 
-    # Security: Always return success message
+    # Security: Always return success message (don't reveal if user exists)
     if not user:
+        # Still return success message for security
+        print(f"Password reset requested for non-existent email: {request.email}")
         return {
-            "message": "If the email exists, a reset link will be sent",
-            "debug_info": "User not found" if DEBUG else None
+            "message": "If an account exists with this email, you'll receive a password reset link shortly."
         }
 
     # Generate secure token
     reset_token = secrets.token_urlsafe(32)
     expires_at = datetime.utcnow() + timedelta(hours=1)
 
-    # Save token to database
+    # Delete any existing tokens for this user
+    await db.execute(
+        select(PasswordResetToken).where(PasswordResetToken.user_id == user.id)
+    )
+    
+    # Save new token to database
     token_entry = PasswordResetToken(
         user_id=user.id,
         token=reset_token,
@@ -303,23 +309,22 @@ async def forgot_password(
         print(f"🎟️  Token: {reset_token}")
         print(f"⏰ Expires: {expires_at.strftime('%Y-%m-%d %H:%M:%S UTC')}")
         print("=" * 80 + "\n")
-
-        return {
-            "message": "If the email exists, a reset link will be sent",
-            "debug_mode": True,
-            "dev_token": reset_token,
-            "reset_link": reset_link,
-            "expires_in": "1 hour"
-        }
+        
+        # Also try to send email in debug mode for testing
+        try:
+            background_tasks.add_task(send_reset_email, user.email, reset_link)
+            print("✅ Email sending task added in background")
+        except Exception as e:
+            print(f"⚠️ Could not send email in debug mode: {e}")
     else:
-        # Production: Send email
-        # You'll need to implement a simple email sending function
-        # background_tasks.add_task(send_reset_email, user.email, reset_link)
+        # Production: Send email using background task
+        background_tasks.add_task(send_reset_email, user.email, reset_link)
+        print(f"✅ Password reset email queued for: {user.email}")
 
-        return {
-            "message": "If the email exists, a reset link will be sent",
-            "debug_mode": False
-        }
+    return {
+        "message": "If an account exists with this email, you'll receive a password reset link shortly.",
+        "debug_mode": DEBUG
+    }
 
 
 @app.post("/auth/reset-password")
