@@ -7,9 +7,9 @@ sys.path.append(str(Path(__file__).parent))
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select, func
-from db_models import AptitudeQuestion
-from utils.question_manager import QuestionManager
-from utils.ai_question_generator import AIQuestionGenerator
+from backend.db_models import AptitudeQuestion
+from backend.utils.question_manager import QuestionManager
+from backend.utils.ai_question_generator import AIQuestionGenerator
 import os
 from dotenv import load_dotenv
 

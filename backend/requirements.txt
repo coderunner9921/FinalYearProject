@@ -43,3 +43,5 @@ python-magic==0.4.27
 # ==================== ASYNC SUPPORT ====================
 httpx==0.27.2
 anyio==4.6.0
+
+slowapi==0.1.9
